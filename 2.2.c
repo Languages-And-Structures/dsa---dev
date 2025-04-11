@@ -8,12 +8,12 @@
 
 //     Property	                   Description
 
-// Time Complexity	        O(n log n) in all cases (best, avg, worst)
-// Space Complexity        O(n) — extra memory required for merging
-// Stability	            Yes (equal elements retain order)
-// Adaptive	            No (ignores existing order)
-// Recursive	            Yes — uses the call stack or explicit stack
-// Cache-friendly          Poor — scattered access during merging
+// Time Complexity	        O(n log n)  in all cases (best, avg, worst)
+// Space Complexity         O(n)        extra memory required for merging
+// Stability	            Yes         (equal elements retain order)
+// Adaptive	                No (        ignores existing order)
+// Recursive	            Yes         uses the call stack or explicit stack
+// Cache-friendly           Poor        scattered access during merging
 
 //   Why It's Efficient
 // Always splits the array into log₂(n) levels.
