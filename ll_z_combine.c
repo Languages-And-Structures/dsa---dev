@@ -1110,6 +1110,634 @@ int main()
 // 4. No Update to Head
 // Unlike insert at beginning, this function never modifies head, so no need for double pointer
 
+// Step 4: Insert Before a Given Node (by Value)
+
+// This operation inserts a new node before the first node that contains the given value.
+// void insertBeforeValue(struct Node** head, int key, int data) {
+//     if (*head == NULL) {
+//         printf("List is empty.\n");
+//         return;
+//     }
+
+//     struct Node* temp = *head;
+
+//     // If inserting before head
+//     if (temp->data == key) {
+//         struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+//         newNode->data = data;
+//         newNode->prev = NULL;
+//         newNode->next = temp;
+
+//         temp->prev = newNode;
+//         *head = newNode;
+//         return;
+//     }
+
+//     while (temp != NULL && temp->data != key)
+//         temp = temp->next;
+
+//     if (temp == NULL) {
+//         printf("Key %d not found.\n", key);
+//         return;
+//     }
+
+//     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+//     newNode->data = data;
+//     newNode->next = temp;
+//     newNode->prev = temp->prev;
+
+//     temp->prev->next = newNode;
+//     temp->prev = newNode;
+// }
+
+// What’s Happening Internally?
+// 1. If the list is empty — do nothing.
+// 2. If key is found at the head node:
+//     ->This becomes like “Insert at Beginning”
+//     ->Head must be updated.
+// 3. Else:
+//     ->Traverse until temp->data == key
+//     ->Insert newNode before temp:
+//         ->newNode->next = temp
+//         ->newNode->prev = temp->prev
+//         ->temp->prev->next = newNode
+//         ->temp->prev = newNode
+
+// Initial DLL:
+// [10] <-> [20] <-> [30]
+
+// Call:
+// insertBeforeValue(&head, 20, 15);
+
+// Diagram (Before and After)
+// Before:
+// [10] <-> [20] <-> [30]
+
+// After:
+// [10] <-> [15] <-> [20] <-> [30]
+
+// // Pointer updates:
+// [15].prev = 10
+// [15].next = 20
+// [10].next = 15
+// [20].prev = 15
+
+//     Scenario	                  Handled?
+
+// List is empty	                yes
+// Key is at head (1st node)	    yes
+// Key not found	                yes
+// Only one node in the list	    yes
+
+// ->  You **must use struct Node** because head might change 
+//     (if inserting before head)
+// ->  temp->prev->next must be updated before you overwrite
+//     temp->prev — pointer overwrite order matters
+// ->  Function is more delicate than "insert after" because
+//     you modify two existing nodes on both sides
+
+
+// Step 5: Delete a Node by Value
+
+// Removes the first node that contains the specified value.
+// void deleteByValue(struct Node** head, int key) {
+//     if (*head == NULL) {
+//         printf("List is empty.\n");
+//         return;
+//     }
+
+//     struct Node* temp = *head;
+
+//     // Case 1: First node matches
+//     if (temp->data == key) {
+//         *head = temp->next;
+//         if (*head != NULL)
+//             (*head)->prev = NULL;
+//         free(temp);
+//         return;
+//     }
+
+//     while (temp != NULL && temp->data != key)
+//         temp = temp->next;
+
+//     if (temp == NULL) {
+//         printf("Key %d not found.\n", key);
+//         return;
+//     }
+
+//     // Bridge links across temp
+//     temp->prev->next = temp->next;
+//     if (temp->next != NULL)
+//         temp->next->prev = temp->prev;
+
+//     free(temp);
+// }
+
+
+// What’s Happening?
+// 1. Check if list is empty → return.
+// 2. If the first node matches the key:
+//     ->  Move head forward
+//     ->  Set new head’s prev = NULL
+//     ->  Free the old head
+// 3. Else:
+//     ->  Traverse until temp->data == key
+//     ->  Update pointers to exclude temp
+//     ->  Free temp
+
+// Diagram: Before and After
+// Before:
+// [10] <-> [20] <-> [30]
+
+// After:
+// [10] <-> [30]
+
+// Pointer update:
+// [10].next = 30
+// [30].prev = 10
+
+//     Case	                        Behavior
+
+// Empty list	                No-op (safe)
+// Key at head	                Update head safely
+// Key not found	            No-op (safe)
+// Node is last	                Just set prev->next = NULL
+// Only one node in list	    List becomes empty
+
+// ->  Do not call free(temp) before updating its neighbors — 
+//     that would cause use-after-free
+// ->  Never assume temp->prev or temp->next exists — always null-check
+// ->  Only call (*head)->prev = NULL if new head exists
+// ->  Segfault is likely if *head is NULL and you dereference without checking
+
+
+// Step 6: Delete a Node at a Given Position (0-based index)
+
+// Removes the node located at a specific position in the 
+// doubly linked list.
+
+// void deleteAtPosition(struct Node** head, int pos) {
+//     if (*head == NULL || pos < 0) {
+//         printf("List is empty or invalid position.\n");
+//         return;
+//     }
+
+//     struct Node* temp = *head;
+//     int i = 0;
+
+//     // Special case: deleting the head
+//     if (pos == 0) {
+//         *head = temp->next;
+//         if (*head != NULL)
+//             (*head)->prev = NULL;
+//         free(temp);
+//         return;
+//     }
+
+//     // Traverse to the node at index pos
+//     while (temp != NULL && i < pos) {
+//         temp = temp->next;
+//         i++;
+//     }
+
+//     if (temp == NULL) {
+//         printf("Position %d exceeds list length.\n", pos);
+//         return;
+//     }
+
+//     // Remove temp
+//     if (temp->prev != NULL)
+//         temp->prev->next = temp->next;
+//     if (temp->next != NULL)
+//         temp->next->prev = temp->prev;
+
+//     free(temp);
+// }
+
+// What’s Happening?
+// 1. Reject negative positions.
+// 2. If pos == 0, remove head and update new head’s prev = NULL.
+// 3. Traverse using i until the pos-th node.
+// 4. Relink prev->next and next->prev around the node at pos.
+// 5. Free the node at that position.
+
+// List:
+// [10] <-> [20] <-> [30] <-> [40]
+
+// Call:
+// deleteAtPosition(&head, 2);
+
+// After:
+// [10] <-> [20] <-> [40]
+
+// Pointer rewiring:
+// [20].next = 40
+// [40].prev = 20
+
+// Scenario	                  Covered
+
+// Empty list	                yes
+// Position < 0	                yes
+// Deleting head	            yes
+// Position exceeds length	    yes
+// Deleting last node	        yes
+
+// ->  Safe traversal: always check temp != NULL during loop
+// ->  Avoid pointer dereference without null checks
+// ->  prev and next must be rewired before freeing the node
+// ->  Positional access is inherently O(n) unless you maintain indices or 
+//     shortcut traversal
+
+
+// Step 7: Forward Traversal (Head → Tail)
+// Prints the list in natural left-to-right order.
+
+// void printForward(struct Node* head) {
+//     struct Node* temp = head;
+//     printf("Forward: ");
+//     while (temp != NULL) {
+//         printf("%d ", temp->data);
+//         temp = temp->next;
+//     }
+//     printf("\n");
+// }
+
+// Key Concepts
+//     ->  Starts at head
+//     ->  Moves right using temp = temp->next
+//     ->  O(n) time
+//     ->  Simple but essential for correctness checks
+
+
+// Step 8: Reverse Traversal (Tail → Head)
+// Prints the list in reverse, starting from the tail.
+
+// void printReverse(struct Node* head) {
+//     if (head == NULL) {
+//         printf("List is empty.\n");
+//         return;
+//     }
+
+//     struct Node* temp = head;
+//     while (temp->next != NULL)  // Reach the tail
+//         temp = temp->next;
+
+//     printf("Reverse: ");
+//     while (temp != NULL) {
+//         printf("%d ", temp->data);
+//         temp = temp->prev;
+//     }
+//     printf("\n");
+// }
+
+
+// DLL:
+// [10] <-> [20] <-> [30] <-> [40]
+
+// Forward:
+// 10 20 30 40
+
+// Reverse:
+// 40 30 20 10
+
+// ->  Forward uses .next, reverse uses .prev
+// ->  For reverse, you must reach tail first
+// ->  Reverse traversal shows the integrity of prev pointers — good for debugging corruption
+// ->  Still O(n), just starts at the opposite end
+
+
+// Step 9: Search for a Value in a Doubly Linked List
+
+// This operation scans the list and returns whether the value 
+// exists — optionally its position.
+
+// int search(struct Node* head, int key) {
+//     int pos = 0;
+//     struct Node* temp = head;
+
+//     while (temp != NULL) {
+//         if (temp->data == key) {
+//             printf("Value %d found at position %d.\n", key, pos);
+//             return 1;
+//         }
+//         temp = temp->next;
+//         pos++;
+//     }
+
+//     printf("Value %d not found in the list.\n", key);
+//     return 0;
+// }
+
+// What’s Happening?
+//     ->  Begin from head, traverse using next
+//     ->  Compare each node's data to the key
+//     ->  Return early on match
+//     ->  If loop ends, value wasn’t found
+
+// DLL:
+// [10] <-> [20] <-> [30] <-> [40]
+
+//Call:
+// search(head, 20);  // Output: found at position 1
+// search(head, 99);  // Output: not found
+
+// Operation	                Time Complexity
+
+// Search (unsorted)	            O(n)
+// Search (sorted)	                O(n), unless you switch to other data   
+//                                  structures (like BSTs or skip lists)
+
+// You can return the pointer to the node instead of a flag.
+// Or return position or index.
+// Or return count of occurrences for duplicates.
+
+
+// Step 10: Count the Number of Nodes
+// Simple utility to count how many nodes are currently in the list.
+
+// Function Code
+
+// int countNodes(struct Node* head) {
+//     int count = 0;
+//     struct Node* temp = head;
+
+//     while (temp != NULL) {
+//         count++;
+//         temp = temp->next;
+//     }
+
+//     return count;
+// }
+
+// What’s Happening?
+//     ->  Start at head
+//     ->  Increment count as you move through each node
+//     ->  Traverse till NULL
+
+// Time & Space Complexity
+// Metric	Value
+// Time Complexity	O(n)
+// Space Complexity	O(1)
+
+
+// Step 11: Free/Destroy the Entire List
+// Prevents memory leaks by deallocating all dynamically allocated nodes.
+
+// Function Code
+
+// void freeList(struct Node** head) {
+//     struct Node* temp = *head;
+
+//     while (temp != NULL) {
+//         struct Node* next = temp->next;
+//         free(temp);
+//         temp = next;
+//     }
+
+//     *head = NULL;  // Avoid dangling pointer
+// }
+
+
+// ->  Always hold next before free(temp) to avoid losing the rest of the list
+// ->  Use *head = NULL after freeing to prevent accidental reuse
+// ->  Important when exiting a program or reinitializing the list
+
+// Operation	  Cleanliness	        Purpose
+
+// countNodes	    Stats	        Know size for bounds
+// freeList	        Hygiene	        Prevent memory leaks
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+};
+
+// INSERT AT BEGINNING
+void insertAtBeginning(struct Node** head, int data) {
+    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = *head;
+
+    if (*head != NULL)
+        (*head)->prev = newNode;
+
+    *head = newNode;
+}
+
+// INSERT AT END
+void insertAtEnd(struct Node** head, int data) {
+    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+
+    if (*head == NULL) {
+        newNode->prev = NULL;
+        *head = newNode;
+        return;
+    }
+
+    struct Node* temp = *head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+// INSERT AFTER A GIVEN NODE
+void insertAfter(struct Node* prevNode, int data) {
+    if (prevNode == NULL) {
+        printf("Previous node cannot be NULL.\n");
+        return;
+    }
+
+    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = prevNode->next;
+    newNode->prev = prevNode;
+
+    if (prevNode->next != NULL)
+        prevNode->next->prev = newNode;
+
+    prevNode->next = newNode;
+}
+
+// INSERT BEFORE A GIVEN NODE
+void insertBefore(struct Node** head, struct Node* nextNode, int data) {
+    if (nextNode == NULL) {
+        printf("Next node cannot be NULL.\n");
+        return;
+    }
+
+    struct Node* newNode = (struct Node*) malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = nextNode;
+    newNode->prev = nextNode->prev;
+
+    if (nextNode->prev != NULL)
+        nextNode->prev->next = newNode;
+    else
+        *head = newNode;
+
+    nextNode->prev = newNode;
+}
+
+// DELETE BY VALUE
+void deleteByValue(struct Node** head, int key) {
+    if (*head == NULL) return;
+
+    struct Node* temp = *head;
+
+    if (temp->data == key) {
+        *head = temp->next;
+        if (*head != NULL)
+            (*head)->prev = NULL;
+        free(temp);
+        return;
+    }
+
+    while (temp != NULL && temp->data != key)
+        temp = temp->next;
+
+    if (temp == NULL) return;
+
+    if (temp->prev != NULL)
+        temp->prev->next = temp->next;
+    if (temp->next != NULL)
+        temp->next->prev = temp->prev;
+
+    free(temp);
+}
+
+// DELETE AT POSITION
+void deleteAtPosition(struct Node** head, int pos) {
+    if (*head == NULL || pos < 0) return;
+
+    struct Node* temp = *head;
+    if (pos == 0) {
+        *head = temp->next;
+        if (*head != NULL)
+            (*head)->prev = NULL;
+        free(temp);
+        return;
+    }
+
+    int i = 0;
+    while (temp != NULL && i < pos) {
+        temp = temp->next;
+        i++;
+    }
+
+    if (temp == NULL) return;
+
+    if (temp->prev != NULL)
+        temp->prev->next = temp->next;
+    if (temp->next != NULL)
+        temp->next->prev = temp->prev;
+
+    free(temp);
+}
+
+// TRAVERSE FORWARD
+void printForward(struct Node* head) {
+    printf("Forward: ");
+    while (head != NULL) {
+        printf("%d ", head->data);
+        head = head->next;
+    }
+    printf("\n");
+}
+
+// TRAVERSE BACKWARD
+void printReverse(struct Node* head) {
+    if (head == NULL) return;
+
+    struct Node* temp = head;
+    while (temp->next != NULL)
+        temp = temp->next;
+
+    printf("Reverse: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->prev;
+    }
+    printf("\n");
+}
+
+// SEARCH A VALUE
+int search(struct Node* head, int key) {
+    int pos = 0;
+    while (head != NULL) {
+        if (head->data == key) {
+            printf("Value %d found at position %d.\n", key, pos);
+            return 1;
+        }
+        head = head->next;
+        pos++;
+    }
+    printf("Value %d not found.\n", key);
+    return 0;
+}
+
+// COUNT NODES
+int countNodes(struct Node* head) {
+    int count = 0;
+    while (head != NULL) {
+        count++;
+        head = head->next;
+    }
+    return count;
+}
+
+// FREE LIST
+void freeList(struct Node** head) {
+    struct Node* temp = *head;
+    while (temp != NULL) {
+        struct Node* next = temp->next;
+        free(temp);
+        temp = next;
+    }
+    *head = NULL;
+}
+
+// MAIN FUNCTION (SAMPLE USAGE)
+int main() {
+    struct Node* head = NULL;
+
+    insertAtEnd(&head, 10);
+    insertAtEnd(&head, 20);
+    insertAtEnd(&head, 30);
+    insertAtBeginning(&head, 5);
+    insertAfter(head->next, 15);          // after 10
+    insertBefore(&head, head->next->next, 12); // before 15
+
+    printForward(head);
+    printReverse(head);
+
+    deleteByValue(&head, 12);
+    deleteAtPosition(&head, 0);
+
+    printForward(head);
+
+    search(head, 20);
+    search(head, 99);
+
+    printf("Total Nodes: %d\n", countNodes(head));
+
+    freeList(&head);
+
+    return 0;
+}
+
+
+
 
 
 
