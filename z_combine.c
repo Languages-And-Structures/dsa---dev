@@ -2039,6 +2039,6 @@ int main() {
 
 // Pointer arithmetic	    arr + j gives address of arr[j]
 // Memory mutation	        Swapping pointer values changes actual memory
-// Stack memory	        Array arr[], ptr1, ptr2 live here
+// Stack memory	            Array arr[], ptr1, ptr2 live here
 // Memory map	            Shows logical view of RAM as array elements
 // Heap memory	            Not used here — becomes crucial in Merge Sort
