@@ -862,6 +862,254 @@ int main()
 }
 
 
+// Step 1: Node Definition + Insert at Beginning
+
+// Node Structure
+
+// struct Node {
+//     int data;
+//     struct Node* prev;
+//     struct Node* next;
+// };
+// We use both prev and next pointers to enable bi-directional traversal 
+// and updates.
+
+
+// Function: Insert at Beginning
+// void insertAtBeginning(struct Node** head, int data) {
+//     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+//     newNode->data = data;
+//     newNode->prev = NULL;
+//     newNode->next = *head;
+
+//     if (*head != NULL)
+//         (*head)->prev = newNode;
+
+//     *head = newNode;
+// }
+
+// What’s Happening Internally
+//     ->  Allocate memory for a new node.
+//     ->  Set its data.
+//     ->  Make its next point to the current head.
+//     ->  Set prev of old head to new node (if it exists).
+//     ->  Update the head pointer to this new node.
+
+// Memory Trace
+
+// Assume the list was:
+// NULL <- [10] <-> [20] <-> [30] -> NULL
+// Now you call:
+// insertAtBeginning(&head, 5);
+
+
+// Diagram (Before and After)
+// Before:
+// head --> [10] <-> [20] <-> [30]
+// After:
+// head --> [5] <-> [10] <-> [20] <-> [30]
+
+// Pointer States:
+//     ->  [5].prev = NULL
+//     ->  [5].next = address of 10
+//     ->  [10].prev = address of 5
+
+// Minimal Test Code
+
+// int main() {
+//     struct Node* head = NULL;
+//     insertAtBeginning(&head, 10);
+//     insertAtBeginning(&head, 20);
+//     insertAtBeginning(&head, 30);
+//     insertAtBeginning(&head, 5);
+// }
+
+
+
+// 1. Pointer Consistency is Crucial
+// If you forget to update (*head)->prev = newNode; before changing *head, 
+// you'll break the back-linking logic.
+//     ->  This is a common bug, especially in interview code.
+//     ->  Always update internal pointers before moving external references.
+
+// 2. Memory Allocation Check (optional but recommended)
+// In real-world or embedded systems, always verify memory allocation:
+
+// if (newNode == NULL) {
+//     fprintf(stderr, "Memory allocation failed\n");
+//     exit(1);
+// }
+
+// 3. Edge Case: Empty List
+//     ->  If *head == NULL, we simply set newNode->next = NULL and newNode->prev = NULL.
+//     ->  No need to update the prev pointer of the old head (since it doesn't exist).
+
+// 4. Dangling Pointers Prevention
+// If you free or overwrite the old head before updating prev, you'll introduce 
+// a dangling pointer in the DLL — a subtle memory corruption source.
+
+// 5. Use of Double Pointers
+// Why struct Node** head?
+//     ->  Because we may need to update the actual head in main.
+//     ->  If we use a single pointer (struct Node* head), changes to head inside the 
+//         function won't reflect outside.
+
+// 6. Cache Optimization (Advanced)
+// In systems with limited memory or high-performance requirements:
+//     ->  Node locality in memory matters — placing nodes contiguously (or reusing memory 
+//         pools) improves CPU cache efficiency.
+//     ->  This matters more in very large lists or real-time systems.
+
+// 7. Thread Safety (Advanced Use)
+// If this function is used in multi-threaded programs:
+//     ->  It must be guarded using mutex locks, because linked list operations are not atomic.
+//     ->  Insertions may cause race conditions if two threads modify head concurrently.
+
+
+// Step 2: Insert at End
+
+// void insertAtEnd(struct Node** head, int data) {
+//     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+//     newNode->data = data;
+//     newNode->next = NULL;
+
+//     if (*head == NULL) {
+//         newNode->prev = NULL;
+//         *head = newNode;
+//         return;
+//     }
+
+//     struct Node* temp = *head;
+//     while (temp->next != NULL)
+//         temp = temp->next;
+
+//     temp->next = newNode;
+//     newNode->prev = temp;
+// }
+
+
+// What’s Happening Internally?
+
+//     ->  Allocate and initialize a new node.
+//     ->  If list is empty, this new node becomes the head.
+//     ->  Else, traverse to the last node (temp).
+//     ->  Update temp->next = newNode
+//     ->  Set newNode->prev = temp
+
+// Initial list:
+// head → [10] <-> [20] <-> [30] → NULL
+
+// Call:
+// insertAtEnd(&head, 40);
+
+// Diagram (Before and After)
+// Before:
+// head → [10] <-> [20] <-> [30]
+
+// After:
+// head → [10] <-> [20] <-> [30] <-> [40]
+
+// [40].prev = address of 30
+// [30].next = address of 40
+// [40].next = NULL
+
+// 1. Avoid Memory Leaks on Traversal
+//     If a pointer like temp is lost or not updated correctly, malloc()'d memory 
+//     becomes inaccessible, causing a memory leak.
+
+// 2. Tail Pointer Optimization
+//     If frequent end-inserts are expected:
+//         ->  Keep a tail pointer to avoid O(n) traversal.
+//         ->  End insert becomes O(1) instead of O(n).
+
+// 3. Traverse Safely
+//     Always check temp != NULL before dereferencing temp->next to avoid segfaults 
+//     in bad usage scenarios.
+
+// 4. Multi-Threading Risk
+//     If multiple threads are appending to the list, insertions must be guarded 
+//     using a mutex lock.
+
+// 5. Watch for Infinite Loops
+//     If you mistakenly update temp->next = newNode before moving temp, and then 
+//     reuse temp, you risk a circular loop or crash.
+
+
+// Step 3: Insert After a Given Node (by Value)
+
+// This function inserts a new node after the first occurrence of 
+// a given value in a doubly linked list.
+
+// void insertAfterValue(struct Node* head, int key, int data) {
+//     struct Node* temp = head;
+
+//     while (temp != NULL && temp->data != key)
+//         temp = temp->next;
+
+//     if (temp == NULL) {
+//         printf("Key %d not found.\n", key);
+//         return;
+//     }
+
+//     struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+//     newNode->data = data;
+
+//     newNode->next = temp->next;
+//     newNode->prev = temp;
+
+//     if (temp->next != NULL)
+//         temp->next->prev = newNode;
+
+//     temp->next = newNode;
+// }
+
+// What’s Happening?
+//     ->  Traverse to the first node with value == key
+//     ->  Allocate and initialize a new node
+//     ->  Link newNode->next = temp->next
+//     ->  Link newNode->prev = temp
+//     ->  If temp->next exists, back-link its prev to newNode
+//     ->  Set temp->next = newNode
+
+// List before insertion:
+// head → [10] <-> [20] <-> [30]
+
+// Now do:
+// insertAfterValue(head, 20, 25);
+
+// Diagram (Before and After)
+// Before:
+// [10] <-> [20] <-> [30]
+
+// After:
+// [10] <-> [20] <-> [25] <-> [30]
+
+// Pointer updates:
+// [20].next = 25
+// [25].prev = 20
+// [25].next = 30
+// [30].prev = 25
+
+// 1. Node Exists Check
+// if (temp == NULL)
+// Important to avoid crashing when the key doesn’t exist.
+
+// 2. Middle vs. End Case Handling
+//     ->  If inserting after the last node, temp->next == NULL, and we don’t 
+//         update temp->next->prev
+//     ->  This check ensures safety:
+//     if (temp->next != NULL)
+//     temp->next->prev = newNode;
+
+// 3. Avoid Memory Leaks or Corruption
+// Make sure:
+//     ->  newNode->prev is correctly linked
+//     ->  temp->next = newNode is assigned after setting other pointers
+//     ->  Freeing or reassigning nodes prematurely can corrupt the list
+
+// 4. No Update to Head
+// Unlike insert at beginning, this function never modifies head, so no need for double pointer
+
 
 
 
