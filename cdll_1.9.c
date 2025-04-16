@@ -68,3 +68,5 @@
 // Use tail pointer in the struct	    O(1) tail access if frequently needed
 // Stop condition: temp != tail	        Ensures precise cycle control
 // Use printf buffering (when large)	Faster output for large lists
+
+// how to store tail in the struct permanently for optimized reverse access ?
