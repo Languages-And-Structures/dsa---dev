@@ -49,8 +49,16 @@
 
 
 //     Case	                            CSLL	                        CDLL
-\
+
 // Insert at position 1	     Reuse insert at beginning	            Reuse insert at beginning
 // Insert at last position   Traverse till last, handle links	    Traverse till tail, handle prev/next
 // Insert in empty list	     Treated as insert at beginning	        Same
 // Position > size + 1	     Rejected as "Position out of bounds"	Same
+
+
+//     Case	                CSLL	                            CDLL
+
+// Position = 1	        Redirect to deleteBeginning	    Same
+// Invalid Position	    Count mismatch → error	        Same
+// Last node deletion	Fix circular link	            Fix both prev and next
+// One node only	    Free and nullify head	        Same
