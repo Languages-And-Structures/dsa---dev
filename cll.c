@@ -46,3 +46,11 @@
 // Empty list	        Print + return	                    Print + return
 // One node	            Free node + head = NULL	            Free node + head = NULL
 // Multiple nodes	    Traverse or use prev + free last	Use head->prev, adjust links
+
+
+//     Case	                            CSLL	                        CDLL
+\
+// Insert at position 1	     Reuse insert at beginning	            Reuse insert at beginning
+// Insert at last position   Traverse till last, handle links	    Traverse till tail, handle prev/next
+// Insert in empty list	     Treated as insert at beginning	        Same
+// Position > size + 1	     Rejected as "Position out of bounds"	Same
