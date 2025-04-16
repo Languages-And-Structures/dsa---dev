@@ -31,3 +31,18 @@
 // Pointer update complexity	Simpler (1 pointer)	    More (2 pointers)
 // Space overhead per node	    Lower	                Higher (stores prev)
 // Risk of dangling pointer	    Moderate	            Moderate
+
+
+// Feature	                               CSLL	                CDLL
+
+// Time Complexity	                O(n) (must traverse)	O(1) (use prev)
+// Traversal needed	                Yes	                    No
+// Pointer rewiring	                1 pointer	            2 pointers
+// Risk of leak (if mishandled)	    High	                Medium
+
+
+// Case	                CSLL handling	                    CDLL handling
+
+// Empty list	        Print + return	                    Print + return
+// One node	            Free node + head = NULL	            Free node + head = NULL
+// Multiple nodes	    Traverse or use prev + free last	Use head->prev, adjust links
