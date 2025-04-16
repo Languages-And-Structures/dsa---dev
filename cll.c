@@ -22,3 +22,12 @@
 // Bi-directional traversal    | No                        | Yes
 // Simpler implementation      | Yes                       | Slightly more complex
 // Insert at end speed         | Slower                    | Faster
+
+
+// Aspect	                            CSLL	            CDLL
+
+// Delete time         	        O(n) (find last node)	O(1) (direct via head->prev)
+// Directional support	        Forward only	        Forward + Backward
+// Pointer update complexity	Simpler (1 pointer)	    More (2 pointers)
+// Space overhead per node	    Lower	                Higher (stores prev)
+// Risk of dangling pointer	    Moderate	            Moderate
