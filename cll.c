@@ -62,3 +62,9 @@
 // Invalid Position	    Count mismatch → error	        Same
 // Last node deletion	Fix circular link	            Fix both prev and next
 // One node only	    Free and nullify head	        Same
+
+// Component	Memory	    Description
+
+// head	        Stack	    Head of list
+// temp	        Stack	    Current node being printed
+// Nodes	    Heap	    Dynamically allocated via malloc
