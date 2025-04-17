@@ -69,3 +69,11 @@
 // Insert beyond range	    Prevented, memory freed	    Prevented, memory freed
 // Insert in empty list	    Handles cleanly	            Handles cleanly
 
+
+//         Case	                CSLL	                  CDLL
+
+// Delete from empty list	      yes	                    yes
+// Delete only node	              yes	                    yes
+// Delete head	                  yes	                    yes
+// Delete last node	              yes	                    yes
+// Delete non-existent key	      yes (graceful message)	yes (graceful message)
