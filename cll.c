@@ -63,3 +63,9 @@
 // Last node deletion	Fix circular link	            Fix both prev and next
 // One node only	    Free and nullify head	        Same
 
+//     Case	                        CSLL	                    CDLL
+
+// Insert at position 1	    Requires tail adjustment	Requires tail and prev
+// Insert beyond range	    Prevented, memory freed	    Prevented, memory freed
+// Insert in empty list	    Handles cleanly	            Handles cleanly
+
