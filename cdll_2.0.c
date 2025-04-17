@@ -48,7 +48,3 @@
 //      ->  newNode->next = 20, newNode->prev = 10
 //      ->  20->prev = 15, 10->next = 15
 // Result: 10 ⇄ 15 ⇄ 20 ⇄ 30 ⇄ (head)
-
-
-
-
