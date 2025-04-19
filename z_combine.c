@@ -2013,9 +2013,9 @@ int main() {
 // [   0x104   ] →   7
 // [   0x108   ] →  42
 // [   0x10C   ] →  23
-// [   0x110   ] →  99
+// [   0x110   ] →  98
 
-// End of Pass 1 — largest value (99) bubbles to the end.
+// End of Pass 1 — largest value (98) bubbles to the end.
 
 // Stack vs Heap Commentary
 // Stack
@@ -2034,6 +2034,7 @@ int main() {
 //     ->  You must free heap memory yourself using free()
 //     ->  Allows dynamic resizing, much larger than the stack
 //     ->  Memory layout is non-contiguous, more fragmented, often slower
+
 
 // Concept	                    Bubble Sort Example
 
